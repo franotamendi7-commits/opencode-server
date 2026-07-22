@@ -18,5 +18,7 @@ WORKDIR /home/opencode
 EXPOSE 4096
 
 ENV HOME=/home/opencode
+ENV OPENCODE_SERVER_PASSWORD=171171
+ENV OPENCODE_MODEL=opencode/laguna-s-2.1-free
 
 CMD ["sh", "-c", "opencode web --port 4096 --hostname 0.0.0.0"]
