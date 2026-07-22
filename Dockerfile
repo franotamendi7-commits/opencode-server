@@ -15,8 +15,14 @@ RUN printf '#!/bin/sh\nexit 0\n' > /usr/bin/xdg-open && chmod +x /usr/bin/xdg-op
 
 RUN useradd -m -s /bin/bash opencode
 
+# Initialize git repo with an initial commit so workspaces work
 USER opencode
 WORKDIR /home/opencode
+RUN git init && \
+    git config user.email "opencode@railway.app" && \
+    git config user.name "OpenCode" && \
+    git add -A && \
+    git commit -m "initial" 2>/dev/null || true
 
 ENV HOME=/home/opencode
 ENV OPENCODE_SERVER_PASSWORD=171171
