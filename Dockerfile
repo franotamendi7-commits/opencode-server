@@ -12,7 +12,7 @@ RUN npm install -g opencode-ai
 
 RUN printf '#!/bin/sh\nexit 0\n' > /usr/bin/xdg-open && chmod +x /usr/bin/xdg-open
 
-RUN useradd -m -s /bin/bash opencode && mkdir -p /data/projects && chown -R opencode:opencode /data
+RUN useradd -m -s /bin/bash opencode && mkdir -p /data && chown -R opencode:opencode /data
 
 USER opencode
 WORKDIR /data
@@ -23,4 +23,10 @@ ENV OPENCODE_MODEL=opencode/laguna-s-2.1-free
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "cd /data/projects && opencode web --port ${PORT:-8080} --hostname 0.0.0.0"]
+CMD ["sh", "-c", "\
+  mkdir -p /data/projects && \
+  if [ -n \"$GIT_REPO\" ] && [ ! -d \"/data/projects/repo/.git\" ]; then \
+    git clone \"$GIT_REPO\" /data/projects/repo 2>/dev/null || true; \
+  fi && \
+  cd /data/projects/repo && \
+  opencode web --port ${PORT:-8080} --hostname 0.0.0.0"]
