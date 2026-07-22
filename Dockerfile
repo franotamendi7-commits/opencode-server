@@ -10,15 +10,19 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
 
 RUN npm install -g opencode-ai
 
-RUN useradd -m -s /bin/bash opencode
+# Fix xdg-open not found
+RUN printf '#!/bin/sh\nexit 0\n' > /usr/bin/xdg-open && chmod +x /usr/bin/xdg-open && \
+    printf '#!/bin/sh\nexit 0\n' > /usr/bin/open && chmod +x /usr/bin/open
+
+RUN useradd -m -s /bin/bash opencode && mkdir -p /data && chown opencode:opencode /data
 
 USER opencode
-WORKDIR /home/opencode
+WORKDIR /data
 
-EXPOSE 4096
+EXPOSE 8080
 
-ENV HOME=/home/opencode
+ENV HOME=/data
 ENV OPENCODE_SERVER_PASSWORD=171171
 ENV OPENCODE_MODEL=opencode/laguna-s-2.1-free
 
-CMD ["sh", "-c", "opencode web --port 4096 --hostname 0.0.0.0"]
+CMD ["sh", "-c", "opencode web --port ${PORT:-8080} --hostname 0.0.0.0"]
