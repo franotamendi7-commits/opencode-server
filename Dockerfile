@@ -13,11 +13,10 @@ RUN npm install -g opencode-ai
 RUN printf '#!/bin/sh\nexit 0\n' > /usr/bin/xdg-open && chmod +x /usr/bin/xdg-open && \
     printf '#!/bin/sh\nexit 0\n' > /usr/bin/open && chmod +x /usr/bin/open
 
-# Download ttyd binary
 RUN curl -fsSL https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64 -o /usr/local/bin/ttyd && \
     chmod +x /usr/local/bin/ttyd
 
-RUN useradd -m -s /bin/bash opencode
+RUN useradd -m -s /bin/bash opencode 
 USER opencode
 WORKDIR /home/opencode/project
 
@@ -36,6 +35,9 @@ ENV TERM=xterm-256color
 EXPOSE 8080
 
 CMD ["sh", "-c", "\
-  tmux new-session -d -s opencode 'cd /home/opencode/project && opencode --model opencode/laguna-s-2.1-free' && \
-  ttyd --port ${PORT:-8080} --client-option titleFixed='OpenCode' tmux attach-session -t opencode \
+  tmux new-session -d -s opencode 'cd /home/opencode/project && exec opencode' && \
+  exec ttyd --port ${PORT:-8080} \
+    --credential opencode:171171 \
+    --client-option titleFixed='OpenCode' \
+    tmux attach-session -t opencode \
 "]
