@@ -10,28 +10,18 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
 
 RUN npm install -g opencode-ai
 
-RUN printf '#!/bin/sh\nexit 0\n' > /usr/bin/xdg-open && chmod +x /usr/bin/xdg-open
+RUN printf '#!/bin/sh\nexit 0\n' > /usr/bin/xdg-open && chmod +x /usr/bin/xdg-open && \
+    printf '#!/bin/sh\nexit 0\n' > /usr/bin/open && chmod +x /usr/bin/open
 
-RUN useradd -m -s /bin/bash opencode && mkdir -p /data/projects && chown -R opencode:opencode /data
+RUN useradd -m -s /bin/bash opencode
 
 USER opencode
-WORKDIR /data
+WORKDIR /home/opencode
 
-ENV HOME=/data
+ENV HOME=/home/opencode
 ENV OPENCODE_SERVER_PASSWORD=171171
 ENV OPENCODE_MODEL=opencode/laguna-s-2.1-free
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "\
-  cd /data/projects && \
-  mkdir -p my-project && \
-  cd my-project && \
-  git init && \
-  echo '# My Project' > README.md && \
-  git add -A && \
-  git config user.email 'opencode@railway.app' && \
-  git config user.name 'OpenCode' && \
-  git commit -m 'init' 2>/dev/null; \
-  cd /data/projects && \
-  opencode web --port ${PORT:-8080} --hostname 0.0.0.0"]
+CMD ["sh", "-c", "opencode web --port ${PORT:-8080} --hostname 0.0.0.0 --print-logs"]
